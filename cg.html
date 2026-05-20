@@ -1,0 +1,483 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.root { font-family: var(--font-sans); font-size: 13px; }
+.figma-shell { background: #1e1e1e; border-radius: 12px; overflow: hidden; }
+.figma-topbar { background: #2c2c2c; height: 38px; display: flex; align-items: center; padding: 0 14px; gap: 8px; border-bottom: 1px solid #111; }
+.figma-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.figma-tabs { flex: 1; display: flex; justify-content: center; gap: 4px; }
+.figma-tab { background: #3a3a3a; color: #888; font-size: 11px; padding: 3px 10px; border-radius: 4px; }
+.figma-tab.active { background: #505050; color: #fff; }
+.figma-body { display: flex; height: 600px; }
+
+.figma-left { width: 158px; background: #252525; border-right: 1px solid #111; padding: 8px 0; flex-shrink: 0; overflow: hidden; }
+.f-section { padding: 5px 12px 2px; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+.f-layer { padding: 4px 8px 4px 14px; font-size: 11px; color: #888; display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; }
+.f-layer:hover { background: #333; color: #ccc; }
+.f-layer.sel { background: #0d5bd1; color: #fff; }
+.f-layer i { font-size: 11px; flex-shrink: 0; }
+.f-layer.ind { padding-left: 22px; color: #666; font-size: 10px; }
+.f-layer.ind.sel { color: #fff; }
+
+.figma-canvas { flex: 1; background: #2a2a2a; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+.canvas-label { position: absolute; top: 8px; left: 10px; font-size: 10px; color: #555; }
+
+.screens { display: flex; gap: 18px; align-items: flex-start; }
+.screen-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.screen-lbl { font-size: 10px; font-weight: 500; }
+
+.cg { width: 310px; background: #f5f6f8; border-radius: 8px; overflow: hidden; border: 1.5px solid #444; }
+.cg-head { background: #fff; border-bottom: 1px solid #e8e8e8; padding: 7px 10px; display: flex; align-items: center; gap: 6px; }
+.cg-logo { font-size: 11px; font-weight: 700; color: #1a56db; display: flex; align-items: center; gap: 3px; }
+.cg-logo i { font-size: 12px; }
+.cg-searchbar { flex: 1; background: #f5f6f8; border: 1px solid #e0e0e0; border-radius: 4px; padding: 3px 7px; font-size: 9px; color: #bbb; display: flex; align-items: center; gap: 3px; }
+.cg-nav { background: #fff; border-bottom: 1px solid #e8e8e8; padding: 0 10px; display: flex; }
+.cg-nav-tab { font-size: 9px; padding: 6px 8px; color: #aaa; border-bottom: 2px solid transparent; white-space: nowrap; }
+.cg-nav-tab.active { color: #1a56db; border-bottom-color: #1a56db; font-weight: 500; }
+.cg-body { padding: 8px; }
+.cg-sec-title { font-size: 10px; font-weight: 600; color: #111; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.cg-sec-title span { font-size: 8px; color: #aaa; font-weight: 400; }
+
+.filter-area { margin-bottom: 6px; }
+.f-row { display: flex; gap: 5px; margin-bottom: 4px; }
+.f-box { flex: 1; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 3px 6px; font-size: 8px; color: #555; display: flex; justify-content: space-between; align-items: center; }
+.f-box.placeholder { color: #ccc; background: #f2f2f2; }
+.f-box i { font-size: 9px; color: #bbb; }
+.date-bar { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 3px 6px; font-size: 8px; color: #555; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.date-bar.placeholder { color: #ccc; background: #f2f2f2; }
+.dbtns { display: flex; gap: 2px; }
+.dbtn { font-size: 7px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #fff; color: #888; }
+.dbtn.active { background: #1a56db; color: #fff; border-color: #1a56db; }
+.dbtn.placeholder { background: #ebebeb; color: #ccc; border-color: #e0e0e0; }
+
+.tbl { background: #fff; border: 1px solid #e8e8e8; border-radius: 5px; overflow: hidden; }
+.tbl-head { background: #f9fafb; border-bottom: 1px solid #e8e8e8; display: grid; grid-template-columns: 12px 50px 22px 28px 62px 52px 36px; gap: 0; padding: 3px 5px; }
+.th { font-size: 7px; color: #bbb; font-weight: 500; white-space: nowrap; overflow: hidden; }
+.tbl-body { }
+.trow { display: grid; grid-template-columns: 12px 50px 22px 28px 62px 52px 36px; gap: 0; padding: 4px 5px; border-bottom: 1px solid #f5f5f5; align-items: start; transition: background .15s; }
+.trow:last-child { border-bottom: none; }
+.trow:hover { background: #fafafa; }
+.td { font-size: 7px; color: #444; overflow: hidden; line-height: 1.4; }
+.td.blue { color: #1a56db; font-weight: 500; }
+.td.muted { color: #aaa; }
+.pill { display: inline-block; font-size: 6px; padding: 1px 4px; border-radius: 99px; white-space: nowrap; }
+.tag-pill { display: inline-block; font-size: 6px; padding: 1px 3px; border-radius: 99px; margin: 1px 1px 0 0; white-space: nowrap; background: #EEEDFE; color: #3C3489; }
+.skel { background: #ebebeb; border-radius: 2px; height: 7px; }
+.tbl-foot { background: #f9fafb; border-top: 1px solid #e8e8e8; padding: 4px 6px; display: flex; align-items: center; justify-content: space-between; }
+.foot-count { font-size: 8px; color: #aaa; }
+.pages { display: flex; gap: 2px; }
+.pg { width: 16px; height: 16px; border: 1px solid #e0e0e0; border-radius: 3px; background: #fff; font-size: 7px; color: #666; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.pg.active { background: #1a56db; color: #fff; border-color: #1a56db; }
+
+.sep { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 55px; }
+.sep i { color: #666; }
+.sep span { font-size: 9px; color: #555; }
+
+.plugin-panel { width: 188px; background: #252525; border-left: 1px solid #111; display: flex; flex-direction: column; flex-shrink: 0; }
+.pl-head { background: #1a1a1a; padding: 10px 12px; border-bottom: 1px solid #111; }
+.pl-title { font-size: 11px; font-weight: 500; color: #fff; display: flex; align-items: center; gap: 5px; }
+.pl-title i { font-size: 13px; color: #a78bfa; }
+.pl-badge { font-size: 9px; background: #3a2f6e; color: #c4b5fd; padding: 2px 6px; border-radius: 3px; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; }
+.pl-badge i { font-size: 9px; }
+.pl-sub { font-size: 9px; color: #555; margin-top: 3px; }
+.pl-body { padding: 10px 12px; flex: 1; overflow-y: auto; }
+.pl-lbl { font-size: 9px; color: #666; margin: 8px 0 3px; text-transform: uppercase; letter-spacing: .05em; }
+.pl-lbl:first-child { margin-top: 0; }
+.pl-select { width: 100%; background: #333; border: 1px solid #444; color: #ddd; font-size: 10px; padding: 4px 6px; border-radius: 4px; cursor: pointer; }
+.pl-select:focus { outline: none; border-color: #7c6fc4; }
+.chip-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+.chip { background: #333; border: 1px solid #444; color: #666; font-size: 9px; padding: 3px 6px; border-radius: 99px; cursor: pointer; user-select: none; transition: all .15s; white-space: nowrap; }
+.chip.on { background: #4c3d8a; border-color: #7c6fc4; color: #d6cfff; }
+.chip:hover { border-color: #666; color: #aaa; }
+.chip.on:hover { border-color: #9c8ef4; }
+
+.replace-preview { margin-top: 8px; background: #1a1a1a; border-radius: 5px; overflow: hidden; border: 1px solid #2a2a2a; }
+.rp-header { padding: 5px 8px; font-size: 9px; color: #888; border-bottom: 1px solid #2a2a2a; display: flex; align-items: center; gap: 4px; }
+.rp-header i { font-size: 10px; color: #a78bfa; }
+.rp-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 8px; border-bottom: 1px solid #222; }
+.rp-row:last-child { border-bottom: none; }
+.rp-key { font-size: 9px; color: #555; }
+.rp-val { font-size: 9px; color: #a78bfa; font-weight: 500; }
+.rp-change { font-size: 8px; display: flex; align-items: center; gap: 3px; }
+.rp-from { color: #555; text-decoration: line-through; }
+.rp-arrow { color: #6d56cf; }
+.rp-to { color: #5dcaa5; font-weight: 500; }
+
+.pl-divider { border: none; border-top: 1px solid #2a2a2a; margin: 8px 0; }
+.pl-btn { width: 100%; background: #6d56cf; border: none; color: #fff; font-size: 11px; font-weight: 500; padding: 8px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: background .15s; }
+.pl-btn:hover { background: #7e69d8; }
+.pl-btn.running { background: #333; cursor: not-allowed; }
+.pl-footer { background: #1a1a1a; padding: 5px 10px; border-top: 1px solid #111; display: flex; align-items: center; gap: 6px; }
+.pl-footer span { font-size: 9px; color: #555; white-space: nowrap; }
+.prog-bar { flex: 1; height: 3px; background: #333; border-radius: 99px; overflow: hidden; }
+.prog-fill { height: 100%; background: #6d56cf; border-radius: 99px; transition: width .3s ease; }
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(2px); } to { opacity:1; transform:translateY(0); } }
+.trow { animation: fadeIn .2s ease both; }
+.toast { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: #4c3d8a; color: #d6cfff; font-size: 10px; padding: 5px 12px; border-radius: 99px; display: flex; align-items: center; gap: 5px; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; }
+</style>
+
+<div class="root">
+<div class="figma-shell">
+
+  <div class="figma-topbar">
+    <div class="figma-dot" style="background:#ff5f57;"></div>
+    <div class="figma-dot" style="background:#febc2e;"></div>
+    <div class="figma-dot" style="background:#28c840;"></div>
+    <div class="figma-tabs">
+      <div class="figma-tab">Design</div>
+      <div class="figma-tab active">Prototype</div>
+      <div class="figma-tab">Inspect</div>
+    </div>
+    <span style="font-size:10px;color:#555;">Replace Content Plugin v1.2</span>
+  </div>
+
+  <div class="figma-body">
+
+    <div class="figma-left">
+      <div class="f-section">Layers</div>
+      <div class="f-layer sel"><i class="ti ti-layout" aria-hidden="true"></i> 티켓 목록 화면</div>
+      <div class="f-layer ind"><i class="ti ti-layout-navbar" aria-hidden="true"></i> Header</div>
+      <div class="f-layer ind"><i class="ti ti-filter" aria-hidden="true"></i> FilterSection</div>
+      <div class="f-layer ind sel"><i class="ti ti-square" aria-hidden="true"></i> TicketRow_1</div>
+      <div class="f-layer ind sel"><i class="ti ti-square" aria-hidden="true"></i> TicketRow_2</div>
+      <div class="f-layer ind sel"><i class="ti ti-square" aria-hidden="true"></i> TicketRow_3</div>
+      <div class="f-layer ind sel"><i class="ti ti-square" aria-hidden="true"></i> TicketRow_4</div>
+      <div class="f-layer ind sel"><i class="ti ti-square" aria-hidden="true"></i> TicketRow_5</div>
+      <div class="f-section" style="margin-top:8px;">Pages</div>
+      <div class="f-layer sel"><i class="ti ti-file" aria-hidden="true"></i> 01_티켓목록</div>
+      <div class="f-layer"><i class="ti ti-file" aria-hidden="true"></i> 02_티켓상세</div>
+      <div class="f-layer"><i class="ti ti-file" aria-hidden="true"></i> 03_대시보드</div>
+    </div>
+
+    <div class="figma-canvas">
+      <span class="canvas-label">Canvas — 100%</span>
+      <div class="screens">
+
+        <div class="screen-group">
+          <div class="screen-lbl" style="color:#e57;">Before</div>
+          <div class="cg">
+            <div class="cg-head">
+              <div class="cg-logo"><i class="ti ti-cloud" aria-hidden="true"></i> cloudgate</div>
+              <div class="cg-searchbar"><i class="ti ti-search" aria-hidden="true"></i> 검색</div>
+            </div>
+            <div class="cg-nav">
+              <div class="cg-nav-tab active">나에게 할당된 티켓</div>
+              <div class="cg-nav-tab">전체 티켓</div>
+            </div>
+            <div class="cg-body">
+              <div class="cg-sec-title">티켓 <span>나에게 할당된 티켓 조회가 가능합니다.</span></div>
+              <div class="filter-area">
+                <div class="f-row">
+                  <div class="f-box placeholder">브랜드 선택 <i class="ti ti-chevron-down" aria-hidden="true"></i></div>
+                  <div class="f-box placeholder">고객 검색 <i class="ti ti-chevron-down" aria-hidden="true"></i></div>
+                </div>
+                <div class="date-bar placeholder">YYYY-MM-DD ~ YYYY-MM-DD <div class="dbtns"><div class="dbtn placeholder">오늘</div><div class="dbtn placeholder">7일</div><div class="dbtn placeholder">1개월</div></div></div>
+              </div>
+              <div class="tbl">
+                <div class="tbl-head"><div class="th"></div><div class="th">브랜드</div><div class="th">채널</div><div class="th">상태</div><div class="th">티켓ID / 유형</div><div class="th">고객명 / 번호</div><div class="th">태그</div></div>
+                <div class="tbl-body">
+                  <div class="trow"><div class="td"></div><div class="td"><div class="skel" style="width:80%;"></div></div><div class="td"><div class="skel" style="width:70%;"></div></div><div class="td"><div class="skel" style="width:90%;height:12px;border-radius:3px;"></div></div><div class="td"><div class="skel" style="width:90%;margin-bottom:2px;"></div><div class="skel" style="width:70%;"></div></div><div class="td"><div class="skel" style="width:85%;margin-bottom:2px;"></div><div class="skel" style="width:60%;"></div></div><div class="td"><div class="skel" style="width:80%;height:10px;border-radius:99px;"></div></div></div>
+                  <div class="trow"><div class="td"></div><div class="td"><div class="skel" style="width:75%;"></div></div><div class="td"><div class="skel" style="width:70%;"></div></div><div class="td"><div class="skel" style="width:90%;height:12px;border-radius:3px;"></div></div><div class="td"><div class="skel" style="width:85%;margin-bottom:2px;"></div><div class="skel" style="width:65%;"></div></div><div class="td"><div class="skel" style="width:80%;margin-bottom:2px;"></div><div class="skel" style="width:70%;"></div></div><div class="td"><div class="skel" style="width:75%;height:10px;border-radius:99px;"></div></div></div>
+                  <div class="trow"><div class="td"></div><div class="td"><div class="skel" style="width:85%;"></div></div><div class="td"><div class="skel" style="width:70%;"></div></div><div class="td"><div class="skel" style="width:90%;height:12px;border-radius:3px;"></div></div><div class="td"><div class="skel" style="width:90%;margin-bottom:2px;"></div><div class="skel" style="width:60%;"></div></div><div class="td"><div class="skel" style="width:75%;margin-bottom:2px;"></div><div class="skel" style="width:80%;"></div></div><div class="td"><div class="skel" style="width:80%;height:10px;border-radius:99px;"></div></div></div>
+                  <div class="trow"><div class="td"></div><div class="td"><div class="skel" style="width:80%;"></div></div><div class="td"><div class="skel" style="width:70%;"></div></div><div class="td"><div class="skel" style="width:90%;height:12px;border-radius:3px;"></div></div><div class="td"><div class="skel" style="width:70%;margin-bottom:2px;"></div><div class="skel" style="width:75%;"></div></div><div class="td"><div class="skel" style="width:85%;margin-bottom:2px;"></div><div class="skel" style="width:65%;"></div></div><div class="td"><div class="skel" style="width:70%;height:10px;border-radius:99px;"></div></div></div>
+                  <div class="trow"><div class="td"></div><div class="td"><div class="skel" style="width:90%;"></div></div><div class="td"><div class="skel" style="width:70%;"></div></div><div class="td"><div class="skel" style="width:90%;height:12px;border-radius:3px;"></div></div><div class="td"><div class="skel" style="width:80%;margin-bottom:2px;"></div><div class="skel" style="width:70%;"></div></div><div class="td"><div class="skel" style="width:90%;margin-bottom:2px;"></div><div class="skel" style="width:55%;"></div></div><div class="td"><div class="skel" style="width:85%;height:10px;border-radius:99px;"></div></div></div>
+                </div>
+                <div class="tbl-foot"><span class="foot-count" style="color:#ccc;">총 --</span><div class="pages"><div class="pg"><i class="ti ti-chevron-left" style="font-size:7px;" aria-hidden="true"></i></div><div class="pg" style="background:#ebebeb;color:#ccc;">1</div><div class="pg" style="background:#ebebeb;color:#ccc;">2</div><div class="pg active">3</div><div class="pg"><i class="ti ti-chevron-right" style="font-size:7px;" aria-hidden="true"></i></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sep">
+          <i class="ti ti-sparkles" style="font-size:18px;color:#a78bfa;" aria-hidden="true"></i>
+          <i class="ti ti-arrow-right" style="font-size:14px;" aria-hidden="true"></i>
+          <span>Replace</span>
+          <span>Content</span>
+        </div>
+
+        <div class="screen-group">
+          <div class="screen-lbl" style="color:#5dcaa5;">After</div>
+          <div class="cg">
+            <div class="cg-head">
+              <div class="cg-logo"><i class="ti ti-cloud" aria-hidden="true"></i> cloudgate</div>
+              <div class="cg-searchbar"><i class="ti ti-search" aria-hidden="true"></i> 검색</div>
+            </div>
+            <div class="cg-nav">
+              <div class="cg-nav-tab active">나에게 할당된 티켓</div>
+              <div class="cg-nav-tab">전체 티켓</div>
+            </div>
+            <div class="cg-body">
+              <div class="cg-sec-title">티켓 <span id="after-sub">나에게 할당된 티켓 조회가 가능합니다.</span></div>
+              <div class="filter-area">
+                <div class="f-row">
+                  <div class="f-box" id="after-brand">엔터식스안양역 <i class="ti ti-chevron-down" aria-hidden="true"></i></div>
+                  <div class="f-box" id="after-customer">김철수 <i class="ti ti-chevron-down" aria-hidden="true"></i></div>
+                </div>
+                <div class="date-bar">
+                  <span id="after-date">2025-06-30 ~ 2025-07-06</span>
+                  <div class="dbtns" id="after-dbtns">
+                    <div class="dbtn">오늘</div>
+                    <div class="dbtn active">7일</div>
+                    <div class="dbtn">1개월</div>
+                  </div>
+                </div>
+              </div>
+              <div class="tbl">
+                <div class="tbl-head"><div class="th"></div><div class="th">브랜드</div><div class="th">채널</div><div class="th">상태</div><div class="th">티켓ID / 유형</div><div class="th">고객명 / 번호</div><div class="th">태그</div></div>
+                <div class="tbl-body" id="after-rows"></div>
+                <div class="tbl-foot"><span class="foot-count" id="after-count">총 45</span><div class="pages"><div class="pg"><i class="ti ti-chevron-left" style="font-size:7px;" aria-hidden="true"></i></div><div class="pg">1</div><div class="pg">2</div><div class="pg active">3</div><div class="pg"><i class="ti ti-chevron-right" style="font-size:7px;" aria-hidden="true"></i></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="toast" id="toast"><i class="ti ti-check" aria-hidden="true"></i> <span id="toast-msg">교체 완료</span></div>
+    </div>
+
+    <div class="plugin-panel">
+      <div class="pl-head">
+        <div class="pl-title"><i class="ti ti-sparkles" aria-hidden="true"></i> AI Content Filler</div>
+        <div class="pl-badge"><i class="ti ti-plug" aria-hidden="true"></i> Figma Replace Content 연동</div>
+        <div class="pl-sub">선택 레이어 5개 · 교체 항목 40개</div>
+      </div>
+      <div class="pl-body">
+
+        <div class="pl-lbl">브랜드 유형</div>
+        <select class="pl-select" id="sel-brand">
+          <option value="offline">오프라인 매장</option>
+          <option value="online">온라인 쇼핑몰</option>
+          <option value="food">F&B 브랜드</option>
+          <option value="finance">금융 / 보험</option>
+        </select>
+
+        <div class="pl-lbl" style="margin-top:8px;">인입 채널</div>
+        <div class="chip-row" id="chip-channel">
+          <div class="chip on" data-val="talk">톡</div>
+          <div class="chip" data-val="call">콜</div>
+          <div class="chip" data-val="email">이메일</div>
+          <div class="chip" data-val="mix">혼합</div>
+        </div>
+
+        <div class="pl-lbl" style="margin-top:8px;">티켓 상태</div>
+        <div class="chip-row" id="chip-status">
+          <div class="chip on" data-val="active">활성</div>
+          <div class="chip" data-val="mixed">혼합</div>
+          <div class="chip" data-val="closed">완료</div>
+        </div>
+
+        <div class="pl-lbl" style="margin-top:8px;">텍스트 케이스</div>
+        <div class="chip-row" id="chip-text">
+          <div class="chip on" data-val="normal">일반</div>
+          <div class="chip" data-val="long">장문</div>
+          <div class="chip" data-val="short">단문</div>
+        </div>
+
+        <div class="pl-lbl" style="margin-top:8px;">검색 기간</div>
+        <div class="chip-row" id="chip-date">
+          <div class="chip" data-val="today">오늘</div>
+          <div class="chip" data-val="3d">3일</div>
+          <div class="chip on" data-val="7d">7일</div>
+          <div class="chip" data-val="1m">1개월</div>
+        </div>
+
+        <div class="pl-divider"></div>
+
+        <div class="replace-preview">
+          <div class="rp-header"><i class="ti ti-replace" aria-hidden="true"></i> Replace Content 미리보기</div>
+          <div id="preview-rows">
+            <div class="rp-row"><span class="pl-rk" style="font-size:8px;">브랜드명</span><div class="rp-change"><span class="rp-from">텍스트</span><span class="rp-arrow">→</span><span class="rp-to" id="prev-brand">엔터식스안양역</span></div></div>
+            <div class="rp-row"><span class="pl-rk" style="font-size:8px;">채널</span><div class="rp-change"><span class="rp-from">텍스트</span><span class="rp-arrow">→</span><span class="rp-to" id="prev-ch">톡</span></div></div>
+            <div class="rp-row"><span class="pl-rk" style="font-size:8px;">티켓 상태</span><div class="rp-change"><span class="rp-from">텍스트</span><span class="rp-arrow">→</span><span class="rp-to" id="prev-st">활성</span></div></div>
+            <div class="rp-row"><span class="pl-rk" style="font-size:8px;">기간</span><div class="rp-change"><span class="rp-from">날짜</span><span class="rp-arrow">→</span><span class="rp-to" id="prev-date">7일</span></div></div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px;">
+          <button class="pl-btn" id="run-btn" onclick="runReplace()">
+            <i class="ti ti-refresh" aria-hidden="true"></i> Replace Content 실행
+          </button>
+        </div>
+      </div>
+      <div class="pl-footer">
+        <span id="last-run">대기 중</span>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%;"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+const D = {
+  brands: {
+    offline: ['엔터식스안양역','스타필드고양','롯데몰수지','현대백화점판교','AK플라자수원'],
+    online:  ['무신사스토어','29CM','지그재그','에이블리','브랜디'],
+    food:    ['스타벅스DT강남','맥도날드홍대','교촌치킨서초','bhc치킨마포','파리바게뜨잠실'],
+    finance: ['삼성화재','현대해상','KB손해보험','메리츠화재','한화생명']
+  },
+  customers: {
+    offline: [{n:'김철수',p:'010-1234-5678'},{n:'이영희',p:'010-9876-5432'},{n:'박민준',p:'010-5555-1234'},{n:'최수현',p:'010-3344-5566'},{n:'정다은',p:'010-7788-9900'}],
+    online:  [{n:'한지민',p:'010-2233-4455'},{n:'오세훈',p:'010-6677-8899'},{n:'신동엽',p:'010-1111-2222'},{n:'배두나',p:'010-3333-4444'},{n:'류현진',p:'010-5555-6666'}],
+    food:    [{n:'강호동',p:'010-9999-0000'},{n:'이수근',p:'010-8888-7777'},{n:'유재석',p:'010-6666-5555'},{n:'박명수',p:'010-4444-3333'},{n:'정준하',p:'010-2222-1111'}],
+    finance: [{n:'김영희',p:'010-1357-2468'},{n:'이철수',p:'010-2468-1357'},{n:'박지수',p:'010-9753-8642'},{n:'최민호',p:'010-8642-9753'},{n:'정우성',p:'010-1122-3344'}]
+  },
+  agents: ['홍길동','김대리','이과장','박팀장','최담당'],
+  types: {
+    offline: {normal:['배송 > 배송지연','설치 > 설치불가','반품 > 단순변심','교환 > 제품불량','A/S > 수리요청'], long:['배송 > 설치 > 배송단계배송단계배송단계배송단계배송...','설치 > 배송단계배송단계배송단계배송단계배송단계배...','반품 > 단순변심 > 구매 후 7일 이내 반품 요청 건 처리...','교환 > 제품불량 > 구성품 누락 및 외관 파손 접수 건...','A/S > 수리요청 > 보증기간 내 무상수리 신청 접수 건...'], short:['배송지연','설치불가','단순변심','제품불량','수리요청']},
+    online:  {normal:['주문 > 취소요청','결제 > 이중결제','교환 > 사이즈오류','반품 > 단순변심','배송 > 오배송'], long:['주문 > 취소요청 > 결제완료 후 배송 전 취소 가능 여부 문의...','결제 > 이중결제 > 동일 주문에 대한 중복 결제 오류 접수...','교환 > 사이즈오류 > 주문한 사이즈와 다른 상품 수령 건...','반품 > 단순변심 > 수령 후 7일 이내 반품 신청 처리 건...','배송 > 오배송 > 타 주소지로 배송된 건 확인 및 처리...'], short:['취소요청','이중결제','사이즈오류','단순변심','오배송']},
+    food:    {normal:['주문 > 메뉴누락','품질 > 이물질','배달 > 지연','결제 > 환불','서비스 > 불친절'], long:['주문 > 누락 > 주문한 메뉴 중 일부가 누락되어 배달된 건...','품질 > 이물질 > 음식 내 이물질 발견으로 환불 및 보상 요청...','배달 > 지연 > 예상 배달시간 초과 30분 이상 지연 접수 건...','결제 > 환불 > 앱 결제 오류로 인한 환불 처리 요청 건...','서비스 > 불친절 > 매장 직원 응대 불만 접수 및 처리 건...'], short:['메뉴누락','이물질','배달지연','환불요청','불친절']},
+    finance: {normal:['보험 > 청구','계약 > 해지','보상 > 지연','납입 > 오류','약관 > 문의'], long:['보험 > 청구 > 실손보험 청구서류 미비로 인한 반려 및 재접수...','계약 > 해지 > 만기 전 중도해지 환급금 산정 문의 건...','보상 > 지연 > 사고접수 후 보상처리 지연에 따른 민원 건...','납입 > 오류 > 자동이체 오류로 인한 연체 처리 취소 요청...','약관 > 문의 > 특약 적용 범위 및 면책 조항 관련 문의 건...'], short:['보험청구','계약해지','보상지연','납입오류','약관문의']}
+  },
+  tags: {
+    offline: {normal:[['배송','설치'],['경기도','태그완료'],['교환요청'],['VIP','긴급'],['A/S']],long:[['배송단계처리중','설치요청대기'],['경기도경기도','태그완료처리'],['교환요청접수완료'],['VIP고객긴급'],['A/S접수완료']],short:[['배송'],['완료'],['교환'],['VIP'],['수리']]},
+    online:  {normal:[['취소'],['결제오류'],['교환','사이즈'],['반품완료'],['오배송']],long:[['취소요청처리대기'],['결제오류확인중'],['교환신청완료','사이즈불일치'],['반품완료'],['오배송확인완료']],short:[['취소'],['결제'],['교환'],['반품'],['배송']]},
+    food:    {normal:[['누락','긴급'],['이물질'],['지연보상'],['환불완료'],['불친절']],long:[['메뉴누락긴급처리'],['이물질이물질'],['지연보상완료'],['환불완료처리'],['불친절접수완료']],short:[['누락'],['이물'],['지연'],['환불'],['CS']]},
+    finance: {normal:[['청구완료'],['해지처리'],['보상지연'],['납입오류'],['약관']],long:[['보험청구접수완료'],['계약해지완료'],['보상지연민원'],['납입오류수정'],['약관문의완료']],short:[['청구'],['해지'],['보상'],['납입'],['약관']]}
+  },
+  statusMap: {
+    active: ['활성','활성','활성','활성','활성'],
+    mixed:  ['활성','활성','대기','완료','활성'],
+    closed: ['완료','완료','완료','완료','완료']
+  },
+  statusStyle: {
+    '활성': {bg:'#E1F5EE',c:'#085041'},
+    '대기': {bg:'#FAEEDA',c:'#633806'},
+    '완료': {bg:'#F1EFE8',c:'#444441'}
+  },
+  totals: {active:45, mixed:62, closed:28},
+  chLabel: {talk:'톡', call:'콜', email:'메일', mix:''},
+  dates: {
+    today: {range:'2025-07-06 ~ 2025-07-06', active:0},
+    '3d':  {range:'2025-07-04 ~ 2025-07-06', active:1},
+    '7d':  {range:'2025-06-30 ~ 2025-07-06', active:2},
+    '1m':  {range:'2025-06-06 ~ 2025-07-06', active:3}
+  },
+  dateLabels: {today:'오늘', '3d':'3일', '7d':'7일', '1m':'1개월'},
+  ids: ['#CG-2025-0481','#CG-2025-0482','#CG-2025-0483','#CG-2025-0484','#CG-2025-0485']
+};
+
+let running = false;
+let state = { brand:'offline', channel:'talk', status:'active', textcase:'normal', date:'7d' };
+
+function getChip(groupId) {
+  const el = document.querySelector(`#${groupId} .chip.on`);
+  return el ? el.dataset.val : null;
+}
+
+function updatePreview() {
+  const b = D.brands[state.brand][0];
+  const ch = state.channel === 'mix' ? '톡/콜' : D.chLabel[state.channel];
+  const st = D.statusMap[state.status][0];
+  document.getElementById('prev-brand').textContent = b;
+  document.getElementById('prev-ch').textContent = ch;
+  document.getElementById('prev-st').textContent = st;
+  document.getElementById('prev-date').textContent = D.dateLabels[state.date];
+}
+
+function buildRows() {
+  const brands = D.brands[state.brand];
+  const custs  = D.customers[state.brand];
+  const types  = D.types[state.brand][state.textcase];
+  const tags   = D.tags[state.brand][state.textcase];
+  const statuses = D.statusMap[state.status];
+  const chLabel = state.channel === 'mix' ? null : D.chLabel[state.channel];
+  const ids = D.ids;
+
+  return statuses.map((st, i) => {
+    const ss = D.statusStyle[st];
+    const ch = chLabel || (i % 2 === 0 ? '톡' : '콜');
+    const tgs = (tags[i] || []).map(t => `<span class="tag-pill">${t}</span>`).join('');
+    return `<div class="trow">
+      <div class="td"><input type="checkbox" style="width:9px;height:9px;"></div>
+      <div class="td">${brands[i % brands.length]}</div>
+      <div class="td">${ch}</div>
+      <div class="td"><span class="pill" style="background:${ss.bg};color:${ss.c};">${st}</span></div>
+      <div class="td blue" style="line-height:1.4;">${ids[i]}<br><span style="color:#aaa;font-size:6px;font-weight:400;">${types[i]}</span></div>
+      <div class="td" style="line-height:1.4;">${custs[i].n}<br><span class="muted">${custs[i].p}</span></div>
+      <div class="td">${tgs}</div>
+    </div>`;
+  }).join('');
+}
+
+function applyToScreen() {
+  document.getElementById('after-rows').innerHTML = buildRows();
+  document.getElementById('after-count').textContent = '총 ' + D.totals[state.status];
+  document.getElementById('after-brand').innerHTML = D.brands[state.brand][0] + ' <i class="ti ti-chevron-down" aria-hidden="true"></i>';
+  document.getElementById('after-customer').innerHTML = D.customers[state.brand][0].n + ' <i class="ti ti-chevron-down" aria-hidden="true"></i>';
+  const di = D.dates[state.date];
+  document.getElementById('after-date').textContent = di.range;
+  const btns = document.getElementById('after-dbtns').children;
+  for (let i = 0; i < btns.length; i++) btns[i].classList.toggle('active', i === di.active);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function runReplace() {
+  if (running) return;
+  running = true;
+  const btn = document.getElementById('run-btn');
+  const prog = document.getElementById('prog-fill');
+  const lastRun = document.getElementById('last-run');
+  btn.classList.add('running');
+  btn.innerHTML = '<i class="ti ti-loader" aria-hidden="true"></i> 교체 중...';
+  prog.style.width = '0%';
+  lastRun.textContent = '실행 중...';
+  let pct = 0;
+  const iv = setInterval(() => {
+    pct += Math.random() * 20 + 10;
+    if (pct >= 100) {
+      pct = 100;
+      clearInterval(iv);
+      prog.style.width = '100%';
+      setTimeout(() => {
+        applyToScreen();
+        btn.classList.remove('running');
+        btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> 교체 완료!';
+        lastRun.textContent = '방금 전';
+        showToast('Replace Content 완료 · 40개 항목 교체됨');
+        setTimeout(() => {
+          btn.innerHTML = '<i class="ti ti-refresh" aria-hidden="true"></i> Replace Content 실행';
+          running = false;
+        }, 1800);
+      }, 200);
+    } else {
+      prog.style.width = Math.round(pct) + '%';
+    }
+  }, 100);
+}
+
+document.getElementById('sel-brand').addEventListener('change', function() {
+  state.brand = this.value;
+  updatePreview();
+  applyToScreen();
+  showToast('브랜드 유형 변경 · Replace Content 적용됨');
+});
+
+['chip-channel','chip-status','chip-text','chip-date'].forEach(groupId => {
+  document.getElementById(groupId).addEventListener('click', function(e) {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    this.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    chip.classList.add('on');
+    const val = chip.dataset.val;
+    if (groupId === 'chip-channel') { state.channel = val; showToast('채널 변경 · Replace Content 적용됨'); }
+    if (groupId === 'chip-status')  { state.status  = val; showToast('티켓 상태 변경 · Replace Content 적용됨'); }
+    if (groupId === 'chip-text')    { state.textcase = val; showToast('텍스트 케이스 변경 · Replace Content 적용됨'); }
+    if (groupId === 'chip-date')    { state.date = val; showToast('검색 기간 변경 · Replace Content 적용됨'); }
+    updatePreview();
+    applyToScreen();
+  });
+});
+
+applyToScreen();
+updatePreview();
+</script>
